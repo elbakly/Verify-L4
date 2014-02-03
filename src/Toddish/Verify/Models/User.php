@@ -132,9 +132,14 @@ class User extends BaseModel implements UserInterface, RemindableInterface
      * Can the User do something
      *
      * @param  array|string $permissions Single permission or an array or permissions
+     * @param  boolean $flag 0 by default 0 means OR 1 means AND 
+     * Ex. $user->can(array("play","jump"),1 ) = user can play and jump
+     * Ex. $user->can(array("play","jump") = user can play or jump
      * @return boolean
+     * 
+     * 
      */
-    public function can($permissions)
+    public function can($permissions,$flag=0)
     {
         $permissions = !is_array($permissions)
             ? array($permissions)
@@ -156,10 +161,23 @@ class User extends BaseModel implements UserInterface, RemindableInterface
         {
             foreach ($role->permissions as $permission)
             {
-                if (in_array($permission->name, $permissions))
+                
+                if($flag==0)
                 {
-                    $valid = TRUE;
-                    break 2;
+                	
+	                if (in_array($permission->name, $permissions))
+	                {
+	                    $valid = TRUE;
+	                    break 2;
+	                }
+                }else
+                {
+                
+	                if (!in_array($permission->name, $permissions))
+	                {
+	                    $valid = False;
+	                    break 2;
+	                }
                 }
             }
         }
